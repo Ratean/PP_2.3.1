@@ -9,10 +9,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
@@ -58,15 +56,14 @@ public class AppConfig implements WebMvcConfigurer {
         props.put("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
         props.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
 
-        JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-        factoryBean.setJpaVendorAdapter(vendorAdapter);
+        factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         factoryBean.setJpaProperties(props);
-        factoryBean.setPackagesToScan(new String[] { "web.model" });
+        factoryBean.setPackagesToScan("web");
         return factoryBean;
     }
 
     @Bean
-    public PlatformTransactionManager transactionManager() {
+    public JpaTransactionManager transactionManager() {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
 
@@ -77,7 +74,7 @@ public class AppConfig implements WebMvcConfigurer {
     public SpringResourceTemplateResolver templateResolver() {
         SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
         templateResolver.setApplicationContext(applicationContext);
-        templateResolver.setPrefix("/WEB-INF/pages/");
+        templateResolver.setPrefix("/WEB-INF/view/");
         templateResolver.setSuffix(".html");
         return templateResolver;
     }
